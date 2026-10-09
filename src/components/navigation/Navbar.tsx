@@ -7,35 +7,35 @@ import { PORTFOLIO_DATA } from "@/data/portfolioData";
 
 export function Navbar() {
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#080b0e]/80 border-b border-slate-800/80">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-        {/* Brand */}
-        <Link href="#top" className="flex items-center gap-2 group">
-          <span className="w-8 h-8 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-mono text-cyan-400 font-bold text-sm group-hover:border-cyan-400 transition-colors">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#070a0e]/85 border-b border-slate-800/80">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between">
+        {/* Brand Monogram */}
+        <Link href="#top" className="flex items-center gap-2.5 group">
+          <span className="w-8 h-8 rounded-lg bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center font-mono text-cyan-400 font-bold text-xs group-hover:border-cyan-400 transition-colors">
             AK
           </span>
-          <span className="font-mono text-xs tracking-wider text-slate-300 font-semibold uppercase">
-            Aadil Khan <span className="text-cyan-400">✳</span>
+          <span className="font-mono text-xs tracking-wider text-slate-200 font-semibold uppercase">
+            Aadil Khan <span className="text-cyan-400 font-normal">/</span> <span className="text-slate-400 font-normal text-[11px]">Systems &amp; Mobile</span>
           </span>
         </Link>
 
-        {/* Nav Links */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8 font-mono text-xs tracking-wider text-slate-400">
-          <Link href="#about" className="hover:text-cyan-400 transition-colors">
-            {"// ABOUT"}
+          <Link href="#experience" className="hover:text-cyan-400 transition-colors">
+            {"// EXPERIENCE"}
           </Link>
-          <Link href="#projects" className="hover:text-cyan-400 transition-colors">
-            {"// PROJECTS"}
+          <Link href="#systems" className="hover:text-cyan-400 transition-colors">
+            {"// SYSTEMS"}
           </Link>
           <Link href="#skills" className="hover:text-cyan-400 transition-colors">
             {"// SKILLS"}
           </Link>
           <Link href="#contact" className="hover:text-cyan-400 transition-colors">
-            {"// CONTACT"}
+            {"// CONNECT"}
           </Link>
         </nav>
 
-        {/* Social Actions */}
+        {/* Social & Direct Contact */}
         <div className="flex items-center gap-3">
           <a
             href={PORTFOLIO_DATA.personal.social.github}
@@ -57,7 +57,7 @@ export function Navbar() {
           </a>
           <a
             href="#contact"
-            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-cyan-400/10 border border-cyan-400/30 font-mono text-xs font-semibold text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400 transition-all"
+            className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-cyan-400/10 border border-cyan-400/30 font-mono text-xs font-semibold text-cyan-300 hover:bg-cyan-400/20 hover:border-cyan-400 transition-all whitespace-nowrap"
           >
             GET IN TOUCH <ArrowUpRight className="w-3.5 h-3.5" />
           </a>
