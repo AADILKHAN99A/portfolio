@@ -1,6 +1,6 @@
 "use client";
 
-import { Briefcase, Building2, CheckCircle2 } from "lucide-react";
+import { Briefcase, CheckCircle2 } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/data/portfolioData";
 
 export function ExperienceSection() {
@@ -16,43 +16,44 @@ export function ExperienceSection() {
         </p>
       </div>
 
-      {/* Experience Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {PORTFOLIO_DATA.experiences.map((exp, idx) => (
+      {/* Flagship Production Experience Card */}
+      <div className="w-full">
+        {PORTFOLIO_DATA.experiences.map((exp) => (
           <div
             key={exp.company}
-            className={`rounded-2xl border border-slate-800 bg-[#0a0e13]/90 p-7 sm:p-9 flex flex-col justify-between ${
-              idx === 0 ? "lg:col-span-7 border-cyan-500/30" : "lg:col-span-5"
-            }`}
+            className="rounded-2xl border border-cyan-500/30 bg-[#0a0e13]/90 p-7 sm:p-10 flex flex-col justify-between shadow-2xl relative overflow-hidden"
           >
+            {/* Ambient Accent Glow */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+
             <div>
               {/* Header meta */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-800/80">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
-                    {idx === 0 ? <Briefcase className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-slate-800/80">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                    <Briefcase className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white">{exp.company}</h3>
-                    <p className="font-mono text-xs text-cyan-400/90 font-medium">{exp.role}</p>
+                    <h3 className="text-2xl font-bold text-white">{exp.company}</h3>
+                    <p className="font-mono text-xs text-cyan-400 font-medium">{exp.role}</p>
                   </div>
                 </div>
 
-                <div className="flex flex-col items-end font-mono text-xs">
-                  <span className="text-slate-400">{exp.period}</span>
+                <div className="flex flex-col sm:items-end font-mono text-xs">
+                  <span className="text-slate-300 font-semibold">{exp.period}</span>
                   {exp.badge && (
-                    <span className="mt-1 px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-[10px] font-semibold uppercase">
+                    <span className="mt-1 px-2.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[10px] font-bold uppercase tracking-wider">
                       {exp.badge}
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Highlights */}
-              <div className="mt-6 space-y-3">
+              {/* Highlights in a responsive grid */}
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {exp.highlights.map((h, i) => (
-                  <div key={i} className="flex items-start gap-2.5 text-sm text-slate-300 leading-relaxed">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-0.5 flex-shrink-0" />
+                  <div key={i} className="flex items-start gap-3 text-sm text-slate-300 leading-relaxed bg-slate-900/40 p-4 rounded-xl border border-slate-800/60">
+                    <CheckCircle2 className="w-4 h-4 text-cyan-400 mt-1 flex-shrink-0" />
                     <span>{h}</span>
                   </div>
                 ))}

@@ -14,7 +14,7 @@ export function HeroSection() {
         <div className="flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse inline-block" />
           <span className="text-slate-300 font-semibold tracking-wide">
-            CURRENT: FLUTTER DEV @ URBAN CULTURE // CTO @ CLYSTRO
+            CURRENT: FLUTTER DEVELOPER @ URBAN CULTURE // SYSTEMS ACTIVE
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-slate-500">

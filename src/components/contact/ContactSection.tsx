@@ -68,7 +68,7 @@ export function ContactSection() {
                 <span className="text-cyan-400">$</span> whoami
               </div>
               <div className="text-emerald-400 pl-4 border-l-2 border-emerald-500/40 leading-relaxed">
-                &gt; Aadil Khan — Flutter Developer @ Urban Culture &amp; CTO @ Clystro
+                &gt; Aadil Khan — Flutter Developer @ Urban Culture
               </div>
 
               <div className="text-slate-400 pt-2">
