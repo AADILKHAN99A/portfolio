@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useSyncExternalStore } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Lightformer, RoundedBox } from "@react-three/drei";
 import * as THREE from "three";
@@ -50,13 +50,7 @@ function Screen({ restart }: { restart: number }) {
     return element;
   }, []);
 
-  const texture = useMemo(() => {
-    if (!canvas) return null;
-    const tex = new THREE.CanvasTexture(canvas);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  }, [canvas]);
-
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
   const startedAt = useRef(0);
   const lastFrame = useRef(-1);
 
@@ -64,8 +58,20 @@ function Screen({ restart }: { restart: number }) {
     startedAt.current = 0;
   }, [restart]);
 
+  useEffect(() => {
+    if (canvas && materialRef.current) {
+      const tex = new THREE.CanvasTexture(canvas);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      materialRef.current.map = tex;
+      materialRef.current.needsUpdate = true;
+      return () => {
+        tex.dispose();
+      };
+    }
+  }, [canvas]);
+
   useFrame(({ clock }) => {
-    if (!canvas || !texture) return;
+    if (!canvas) return;
     const t = clock.getElapsedTime();
     if (startedAt.current === 0) startedAt.current = t;
     const frame = Math.floor(t * 10);
@@ -130,15 +136,15 @@ function Screen({ restart }: { restart: number }) {
       ctx.fillStyle = color("--screen-scan");
       ctx.fillRect(x, 0, 1, 250);
     }
-    texture.needsUpdate = true;
+    if (materialRef.current?.map) {
+      materialRef.current.map.needsUpdate = true;
+    }
   });
-
-  if (!texture) return null;
 
   return (
     <mesh position={[0, 0.18, 0.8]}>
       <planeGeometry args={[4.8, 2.5]} />
-      <meshBasicMaterial map={texture} toneMapped={false} />
+      <meshBasicMaterial ref={materialRef} toneMapped={false} />
     </mesh>
   );
 }
@@ -267,10 +273,13 @@ function Monitor({
 export function RetroMonitor({ restart }: { restart: number }) {
   const pointer = useRef({ x: 0, y: 0 });
   const scroll = useRef(0);
-  const [mounted, setMounted] = useState(false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
-    setMounted(true);
     const onMove = (event: PointerEvent) => {
       pointer.current.x = (event.clientX / window.innerWidth) * 2 - 1;
       pointer.current.y = (event.clientY / window.innerHeight) * 2 - 1;

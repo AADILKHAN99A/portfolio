@@ -22,16 +22,16 @@ export function Navbar() {
         {/* Nav Links */}
         <nav className="hidden md:flex items-center gap-8 font-mono text-xs tracking-wider text-slate-400">
           <Link href="#about" className="hover:text-cyan-400 transition-colors">
-            // ABOUT
+            {"// ABOUT"}
           </Link>
           <Link href="#projects" className="hover:text-cyan-400 transition-colors">
-            // PROJECTS
+            {"// PROJECTS"}
           </Link>
           <Link href="#skills" className="hover:text-cyan-400 transition-colors">
-            // SKILLS
+            {"// SKILLS"}
           </Link>
           <Link href="#contact" className="hover:text-cyan-400 transition-colors">
-            // CONTACT
+            {"// CONTACT"}
           </Link>
         </nav>
 

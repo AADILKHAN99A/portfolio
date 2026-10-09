@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowUp } from "lucide-react";
 import { PORTFOLIO_DATA } from "@/data/portfolioData";
 

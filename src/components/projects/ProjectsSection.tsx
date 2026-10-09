@@ -36,7 +36,7 @@ export function ProjectsSection() {
             <div>
               <div className="flex items-center justify-between font-mono text-xs text-slate-500 mb-4">
                 <span className="flex items-center gap-1.5 text-cyan-400/90 font-semibold">
-                  <FolderGit2 className="w-3.5 h-3.5" /> 0{idx + 1} // REPO
+                  <FolderGit2 className="w-3.5 h-3.5" /> 0{idx + 1} {"// REPO"}
                 </span>
                 {project.featured && (
                   <span className="px-2 py-0.5 rounded bg-amber-400/10 border border-amber-400/30 text-amber-300 text-[10px] uppercase font-bold tracking-wider">
