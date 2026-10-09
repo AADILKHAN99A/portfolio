@@ -1,75 +1,83 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowDownRight, RotateCcw } from "lucide-react";
-import { RetroMonitor } from "@/components/3d/RetroMonitor";
+import { ArrowDownRight, Smartphone, Server, ShieldCheck, Terminal } from "lucide-react";
+import { PORTFOLIO_DATA } from "@/data/portfolioData";
 
 export function HeroSection() {
-  const [restart, setRestart] = useState(0);
+  const highlights = [
+    { icon: Smartphone, label: "Production Flutter Mobile", desc: "60 FPS architecture & state management" },
+    { icon: Server, label: "Real-Time Cloud Backend", desc: "Node.js & Firebase Cloud Functions" },
+    { icon: ShieldCheck, label: "Android Systems & Gradle", desc: "SDK migration, Play Integrity & build triage" },
+  ];
 
   return (
-    <section id="top" className="relative w-full pt-6 pb-16 px-4 sm:px-8 max-w-7xl mx-auto">
-      {/* Telemetry Status Strip */}
-      <div className="flex items-center justify-between pb-4 border-b border-slate-800/80 font-mono text-xs text-slate-400">
+    <section id="top" className="relative w-full pt-12 pb-20 px-4 sm:px-8 max-w-7xl mx-auto">
+      {/* Top Status Strip */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-slate-800/80 font-mono text-xs text-slate-400">
         <div className="flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse inline-block" />
           <span className="text-slate-300 font-semibold tracking-wide">
             CURRENT: FLUTTER DEVELOPER @ URBAN CULTURE // SYSTEMS ACTIVE
           </span>
         </div>
-        <div className="hidden sm:flex items-center gap-4 text-slate-500">
+        <div className="flex items-center gap-4 text-slate-500">
           <span>JAIPUR, IN</span>
-          <span>SYSTEM ACTIVE</span>
-          <span className="text-cyan-400/90 font-bold">/ 001</span>
+          <span className="text-cyan-400/90 font-bold">EST. 2026 // 001</span>
         </div>
       </div>
 
-      {/* 3D CRT Monitor Stage */}
-      <div className="relative mt-6 w-full h-[440px] sm:h-[540px] lg:h-[620px] rounded-2xl border border-slate-800 bg-gradient-to-b from-[#0f171d] via-[#090e12] to-[#070a0e] overflow-hidden crt-grid-bg">
-        {/* 3D Canvas */}
-        <div className="absolute inset-0 z-10 flex items-center justify-center">
-          <RetroMonitor restart={restart} />
+      {/* Main Hero Header */}
+      <div className="mt-12 sm:mt-16 max-w-4xl">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 font-mono text-xs text-cyan-300 tracking-wider mb-6">
+          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+          <span>CROSS-PLATFORM &amp; SYSTEMS ENGINEER</span>
         </div>
 
-        {/* Side Note */}
-        <div className="hidden lg:block absolute right-6 top-1/2 -translate-y-1/2 z-20 font-mono text-[10px] tracking-widest text-slate-600 [writing-mode:vertical-rl] select-none">
-          MOVE CURSOR · ROTATE 3D MONITOR
-        </div>
+        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-white leading-[1.08]">
+          Engineering mobile platforms &amp; <br />
+          <span className="italic font-normal text-slate-400">scalable backend systems.</span>
+        </h1>
 
-        {/* Stage Bottomline */}
-        <div className="absolute bottom-4 left-6 right-6 z-20 flex justify-between font-mono text-xs text-slate-500 tracking-wider">
-          <span>ANALOG SOUL / DIGITAL MIND</span>
-          <span>© AADIL KHAN</span>
-        </div>
-      </div>
+        <p className="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl leading-relaxed">
+          {PORTFOLIO_DATA.personal.bio}
+        </p>
 
-      {/* Hero Content Stack (Strictly Max 4 Text Elements) */}
-      <div className="mt-10 grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
-        <div className="lg:col-span-8">
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-white leading-[1.08]">
-            Engineering mobile platforms &amp; <br />
-            <span className="italic font-normal text-slate-400">scalable backend systems.</span>
-          </h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-400 max-w-xl leading-relaxed">
-            Specializing in production Flutter architectures, real-time data sync, and resilient system-level mobile engineering.
-          </p>
-        </div>
-
-        {/* Hero CTAs */}
-        <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-end">
+        {/* Action CTAs */}
+        <div className="mt-10 flex flex-wrap items-center gap-4">
           <a
             href="#systems"
-            className="h-12 px-5 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all glow-box-cyan whitespace-nowrap"
+            className="h-12 px-6 rounded-xl border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all glow-box-cyan whitespace-nowrap"
           >
             EXPLORE SYSTEMS <ArrowDownRight className="w-4 h-4 text-cyan-400" />
           </a>
-          <button
-            onClick={() => setRestart((v) => v + 1)}
-            className="h-12 px-5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all whitespace-nowrap"
+          <a
+            href="#experience"
+            className="h-12 px-6 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 text-slate-300 font-mono text-xs font-semibold tracking-wider flex items-center justify-center gap-2 transition-all whitespace-nowrap"
           >
-            <RotateCcw className="w-3.5 h-3.5 text-slate-400" /> REBOOT CRT MONITOR
-          </button>
+            VIEW EXPERIENCE
+          </a>
         </div>
+      </div>
+
+      {/* Core Architectural Pillars Strip */}
+      <div className="mt-16 sm:mt-20 grid grid-cols-1 md:grid-cols-3 gap-5">
+        {highlights.map((item, idx) => {
+          const Icon = item.icon;
+          return (
+            <div
+              key={idx}
+              className="p-5 rounded-2xl border border-slate-800/80 bg-[#090d12]/80 flex items-start gap-4"
+            >
+              <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 flex-shrink-0">
+                <Icon className="w-5 h-5" />
+              </div>
+              <div>
+                <h2 className="font-bold text-white text-sm tracking-wide">{item.label}</h2>
+                <p className="mt-1 text-xs text-slate-400 font-mono leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </section>
   );
