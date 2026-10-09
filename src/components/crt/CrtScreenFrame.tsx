@@ -1,231 +1,147 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { RotateCcw, Sparkles } from "lucide-react";
+import { motion } from "motion/react";
+import { RotateCcw, Sparkles, ZoomIn, ZoomOut } from "lucide-react";
 
 interface CrtScreenFrameProps {
   children: React.ReactNode;
 }
 
 export function CrtScreenFrame({ children }: CrtScreenFrameProps) {
-  // States: "booting" -> "zooming" -> "active"
-  const [phase, setPhase] = useState<"booting" | "zooming" | "active">("booting");
+  // Lifecycle states:
+  // "booting": small monitor with stand, boot text on screen (0-2.2s)
+  // "preview": small monitor with stand, LIVE website rendered inside screen! (2.2-2.8s)
+  // "zoomed": monitor smoothly scales up to full viewport, keeping bezels, buttons & stand accents
+  const [stage, setStage] = useState<"booting" | "preview" | "zoomed">("booting");
   const [bootProgress, setBootProgress] = useState(0);
   const [scanlinesEnabled, setScanlinesEnabled] = useState(true);
 
-  // Boot sequence timer (2.6s total)
+  // Boot sequence timer
   useEffect(() => {
-    if (phase !== "booting") return;
+    if (stage !== "booting") return;
 
     const interval = setInterval(() => {
       setBootProgress((prev) => {
         if (prev >= 100) {
           clearInterval(interval);
-          // Trigger zoom animation
-          setTimeout(() => setPhase("zooming"), 200);
-          setTimeout(() => setPhase("active"), 1100);
+          // Step 1: Switch to "preview" - show live website inside small monitor!
+          setTimeout(() => setStage("preview"), 200);
+          // Step 2: Smoothly zoom into the monitor to fill screen!
+          setTimeout(() => setStage("zoomed"), 800);
           return 100;
         }
-        // Rapid increment with slight variance for authentic retro feel
-        return Math.min(100, prev + Math.floor(Math.random() * 8 + 6));
+        return Math.min(100, prev + Math.floor(Math.random() * 10 + 8));
       });
-    }, 110);
+    }, 120);
 
     return () => clearInterval(interval);
-  }, [phase]);
+  }, [stage]);
 
   const reboot = () => {
     setBootProgress(0);
-    setPhase("booting");
+    setStage("booting");
   };
 
-  const skipBoot = () => {
-    setBootProgress(100);
-    setPhase("active");
+  const toggleZoom = () => {
+    setStage((prev) => (prev === "zoomed" ? "preview" : "zoomed"));
   };
+
+  const isSmall = stage === "booting" || stage === "preview";
 
   return (
-    <div className="relative w-screen h-screen overflow-hidden bg-[#05070a] select-none">
-      {/* ============================================================== */}
-      {/* 1. INITIAL BOOT & ZOOM PHASE (FLOATING CENTERED MONITOR)      */}
-      {/* ============================================================== */}
-      <AnimatePresence>
-        {phase !== "active" && (
-          <motion.div
-            key="boot-stage"
-            className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-[#05070a]"
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+    <div className="relative w-screen h-screen overflow-hidden bg-[#05070a] flex items-center justify-center select-none">
+      {/* Ambient Retro Room / Desk Background Grid */}
+      <div className="absolute inset-0 crt-grid-bg opacity-30 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[160px] pointer-events-none" />
+
+      {/* Floating Status & Skip Bar (Visible during small/booting stage) */}
+      {isSmall && (
+        <div className="absolute top-6 left-6 right-6 z-50 flex items-center justify-between font-mono text-xs text-slate-400">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            <span className="text-slate-300 font-semibold tracking-wider">
+              {stage === "booting" ? "INITIALIZING WORKSTATION..." : "WEBSITE LOADED // COMMENCING ZOOM"}
+            </span>
+          </div>
+
+          <button
+            onClick={() => setStage("zoomed")}
+            className="px-3.5 py-1.5 rounded-lg border border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-mono text-xs tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            {/* Ambient Background Grid & Lighting */}
-            <div className="absolute inset-0 crt-grid-bg opacity-30 pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-cyan-500/5 rounded-full blur-[140px] pointer-events-none" />
-
-            {/* Skip Button in top right corner during boot */}
-            <div className="absolute top-6 right-6 z-50">
-              <button
-                onClick={skipBoot}
-                className="px-3.5 py-1.5 rounded-lg border border-slate-800 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-mono text-xs tracking-wider transition-colors flex items-center gap-1.5 cursor-pointer"
-              >
-                <span>SKIP BOOT</span>
-                <span className="text-cyan-400">››</span>
-              </button>
-            </div>
-
-            {/* The Centered CRT Monitor with cinematic scale zoom */}
-            <motion.div
-              className="relative w-full max-w-[760px] aspect-[4/3] rounded-[32px] p-5 sm:p-7 shadow-2xl flex flex-col justify-between"
-              style={{
-                backgroundColor: "#cfcac0",
-                boxShadow:
-                  "0 30px 80px -15px rgba(0,0,0,0.9), inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.4)",
-                border: "4px solid #b2ada2",
-              }}
-              animate={
-                phase === "zooming"
-                  ? {
-                      scale: [1, 2.8],
-                      opacity: [1, 0.95, 0],
-                      filter: ["blur(0px)", "blur(2px)"],
-                    }
-                  : { scale: 1, opacity: 1 }
-              }
-              transition={{
-                duration: 0.9,
-                ease: [0.16, 1, 0.3, 1], // Smooth cinematic camera dive
-              }}
-            >
-              {/* Inner Charcoal Screen Bezel */}
-              <div
-                className="relative flex-1 rounded-[22px] p-3 sm:p-4 flex flex-col overflow-hidden"
-                style={{
-                  backgroundColor: "#292a2e",
-                  boxShadow: "inset 0 4px 14px rgba(0,0,0,0.8), 0 2px 4px rgba(255,255,255,0.1)",
-                  border: "3px solid #141517",
-                }}
-              >
-                {/* CRT Glass Surface */}
-                <div className="relative flex-1 rounded-[16px] bg-[#0a1417] p-6 sm:p-8 flex flex-col justify-between overflow-hidden border border-black shadow-[inset_0_0_40px_rgba(0,0,0,0.9)]">
-                  {/* Flickering Scanlines on glass */}
-                  <div className="absolute inset-0 pointer-events-none bg-[repeating-linear-gradient(0deg,transparent_0px,transparent_2px,rgba(0,0,0,0.3)_3px)] z-20" />
-
-                  {/* Glass Glare Reflection */}
-                  <div className="absolute -top-24 -left-24 w-72 h-72 bg-gradient-to-br from-white/10 to-transparent rounded-full blur-xl pointer-events-none z-20" />
-
-                  {/* Terminal Header */}
-                  <div className="relative z-10 flex items-center justify-between font-mono text-[11px] text-cyan-400/80 tracking-widest border-b border-cyan-500/20 pb-3">
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                      AADIL_KHAN // PORTAL_OS v2.6
-                    </span>
-                    <span className="text-amber-400 font-bold">{bootProgress}%</span>
-                  </div>
-
-                  {/* Center Matrix Terminal Output */}
-                  <div className="relative z-10 my-auto space-y-2 font-mono text-xs text-emerald-400/90 tracking-wide">
-                    <p className="text-cyan-300 font-bold text-sm sm:text-base">
-                      &gt; INITIALIZING PRODUCTION WORKSPACE...
-                    </p>
-                    <p className="opacity-80">&gt; Mounting Flutter &amp; Android runtime core...</p>
-                    <p className="opacity-70">&gt; Syncing Urban Culture real-time telemetry pipelines...</p>
-                    <p className="opacity-60">&gt; Loading 3D hardware canvas &amp; system architectures...</p>
-                    <p className="text-cyan-400 animate-pulse">&gt; Compiling interactive viewport. Stand by...</p>
-                  </div>
-
-                  {/* Bottom Segmented Progress Bar */}
-                  <div className="relative z-10 space-y-2 font-mono text-[11px]">
-                    <div className="flex justify-between text-slate-400">
-                      <span>SYSTEM BOOT SEQUENCE</span>
-                      <span className="text-cyan-300 font-bold">{bootProgress}% LOADED</span>
-                    </div>
-                    <div className="h-3 w-full bg-[#122428] rounded border border-cyan-500/30 overflow-hidden p-0.5">
-                      <div
-                        className="h-full bg-gradient-to-r from-cyan-500 via-teal-400 to-amber-400 rounded transition-all duration-150"
-                        style={{ width: `${bootProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Lower Tactile Chassis Control Strip */}
-              <div className="mt-3 sm:mt-4 flex items-center justify-between px-2 font-mono text-xs">
-                {/* Brand Imprint */}
-                <span className="text-slate-600 font-bold tracking-widest text-[10px]">
-                  AADIL KHAN ✳ RETRO-2026
-                </span>
-
-                {/* Status Indicator & Tactile Buttons */}
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff] animate-pulse" />
-                    <span className="text-[10px] text-slate-600 font-semibold">POWER ON</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {[1, 2, 3].map((i) => (
-                      <div
-                        key={i}
-                        className="w-4 h-2 rounded-sm bg-[#5a5c62] border border-[#3e4045] shadow-inner"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <span>ENTER WORKSTATION</span>
+            <span className="text-cyan-400">››</span>
+          </button>
+        </div>
+      )}
 
       {/* ============================================================== */}
-      {/* 2. PERSISTENT CRT OPERATING FRAME (THE SURROUNDING MONITOR)    */}
+      {/* THE SINGLE UNIFIED CRT MONITOR (SCALES FROM DESK TO VIEWPORT)   */}
       {/* ============================================================== */}
       <motion.div
-        className="w-full h-full flex flex-col p-2.5 sm:p-5 lg:p-7 relative transition-all"
-        style={{
-          backgroundColor: "#1c1e22", // Vintage outer casing color
+        layout
+        className="relative flex flex-col items-center justify-center z-20"
+        animate={{
+          // Small floating monitor: ~740px width with comfortable margin
+          // Zoomed monitor: fills almost 100% of viewport with visible bezel borders
+          width: isSmall ? "min(90vw, 760px)" : "100vw",
+          height: isSmall ? "min(70vh, 560px)" : "100vh",
+          padding: isSmall ? "0px" : "clamp(6px, 1.2vw, 16px)",
         }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: phase === "active" ? 1 : 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{
+          duration: 1.1,
+          ease: [0.16, 1, 0.3, 1], // Cinematic smooth camera push-in
+        }}
       >
-        {/* Outer Molded Chassis Edge & Shadow */}
-        <div
-          className="relative w-full h-full rounded-[24px] sm:rounded-[34px] flex flex-col overflow-hidden"
+        {/* ============================================================== */}
+        {/* MONITOR HOUSING (MOLDED CHASSIS)                               */}
+        {/* ============================================================== */}
+        <motion.div
+          className="relative w-full h-full flex flex-col justify-between overflow-hidden transition-all"
           style={{
-            backgroundColor: "#2e3137", // CRT monitor bezel frame
-            border: "8px solid #3c3f46",
-            boxShadow:
-              "inset 0 4px 16px rgba(0,0,0,0.85), inset 0 -4px 12px rgba(0,0,0,0.9), 0 0 50px rgba(0,0,0,0.9)",
+            backgroundColor: "#2e3137", // CRT monitor bezel tone
+            borderRadius: isSmall ? "28px" : "clamp(16px, 2vw, 28px)",
+            border: isSmall ? "6px solid #4a4d55" : "clamp(6px, 1vw, 10px) solid #3d4047",
+            boxShadow: isSmall
+              ? "0 35px 80px -10px rgba(0,0,0,0.95), 0 0 0 1px rgba(255,255,255,0.1), inset 0 2px 4px rgba(255,255,255,0.2)"
+              : "inset 0 4px 16px rgba(0,0,0,0.8), 0 0 60px rgba(0,0,0,0.95)",
           }}
         >
-          {/* Top Chassis Bezel Header Bar */}
-          <div className="h-9 sm:h-10 bg-[#25272c] border-b border-[#1b1c20] px-4 sm:px-6 flex items-center justify-between font-mono text-[10px] sm:text-[11px] text-slate-400 select-none z-30">
-            {/* Left: Brand & Telemetry */}
-            <div className="flex items-center gap-3">
+          {/* Top Chassis Strip */}
+          <div className="h-8 sm:h-9 bg-[#24262b] border-b border-[#181a1d] px-4 sm:px-6 flex items-center justify-between font-mono text-[10px] sm:text-[11px] text-slate-400 select-none z-30 flex-shrink-0">
+            {/* Left: Brand & Model */}
+            <div className="flex items-center gap-2.5">
               <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff] animate-pulse" />
-              <span className="font-bold tracking-wider text-slate-300">
-                AADIL KHAN // RETRO CRT WORKSTATION
+              <span className="font-bold tracking-wider text-slate-200">
+                AADIL KHAN // CRT-4000
               </span>
-              <span className="hidden md:inline text-slate-600">|</span>
-              <span className="hidden md:inline text-slate-500">60Hz PHOSPHOR DISPLAY</span>
+              <span className="hidden sm:inline text-slate-600">|</span>
+              <span className="hidden sm:inline text-slate-400">FLUTTER &amp; SYSTEMS WORKSTATION</span>
             </div>
 
-            {/* Right: Quick Telemetry Actions */}
-            <div className="flex items-center gap-3">
+            {/* Right: Interactive Hardware Controls */}
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setScanlinesEnabled((v) => !v)}
-                className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#1e2024] hover:bg-[#2e3138] border border-slate-700/60 text-slate-300 text-[10px] font-semibold transition-colors cursor-pointer"
-                title="Toggle Scanline Simulation"
+                className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1a1c20] hover:bg-[#282a30] border border-slate-700/60 text-slate-300 text-[10px] font-semibold transition-colors cursor-pointer"
+                title="Toggle CRT Scanline Overlay"
               >
                 <Sparkles className="w-3 h-3 text-cyan-400" />
                 <span>{scanlinesEnabled ? "SCANLINES: ON" : "SCANLINES: OFF"}</span>
               </button>
 
               <button
+                onClick={toggleZoom}
+                className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-[#1a1c20] hover:bg-[#282a30] border border-slate-700/60 text-slate-300 text-[10px] font-semibold transition-colors cursor-pointer"
+                title={isSmall ? "Zoom into Monitor" : "Zoom out to Desk"}
+              >
+                {isSmall ? <ZoomIn className="w-3 h-3 text-cyan-400" /> : <ZoomOut className="w-3 h-3 text-cyan-400" />}
+                <span className="hidden sm:inline">{isSmall ? "ZOOM IN" : "DESK VIEW"}</span>
+              </button>
+
+              <button
                 onClick={reboot}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-semibold transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2 py-0.5 rounded bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 text-[10px] font-semibold transition-colors cursor-pointer"
                 title="Re-run Boot Sequence"
               >
                 <RotateCcw className="w-3 h-3" />
@@ -234,33 +150,136 @@ export function CrtScreenFrame({ children }: CrtScreenFrameProps) {
             </div>
           </div>
 
-          {/* CRT Screen Display Window (Where the Website Runs) */}
-          <div className="relative flex-1 w-full overflow-hidden bg-[#070a0e]">
-            {/* Scrollable Website Container inside the CRT Screen */}
+          {/* ============================================================== */}
+          {/* CRT INNER SCREEN WINDOW (THE ACTUAL DISPLAY)                   */}
+          {/* ============================================================== */}
+          <div
+            className="relative flex-1 w-full overflow-hidden bg-[#070a0e] flex flex-col"
+            style={{
+              margin: isSmall ? "6px" : "0px",
+              borderRadius: isSmall ? "16px" : "0px",
+              boxShadow: "inset 0 0 50px rgba(0,0,0,0.85)",
+            }}
+          >
+            {/* The Live Portfolio Website (ALWAYS MOUNTED & RUNNING INSIDE THE SCREEN!) */}
             <div className="absolute inset-0 overflow-y-auto overflow-x-hidden selection:bg-cyan-500/20 selection:text-cyan-300">
               {children}
             </div>
 
-            {/* CRT Glass Vignette & Scanlines (Persistent Screen Filter) */}
+            {/* Booting Terminal Overlay (Covers the website ONLY during boot) */}
+            {stage === "booting" && (
+              <motion.div
+                className="absolute inset-0 z-30 bg-[#091316] p-6 sm:p-8 flex flex-col justify-between font-mono"
+                initial={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Terminal Header */}
+                <div className="flex items-center justify-between text-[11px] text-cyan-400/90 border-b border-cyan-500/20 pb-3">
+                  <span className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    AADIL_KHAN // BOOT_KERNEL_2026
+                  </span>
+                  <span className="text-amber-400 font-bold">{bootProgress}%</span>
+                </div>
+
+                {/* Matrix Logs */}
+                <div className="my-auto space-y-2 text-xs text-emerald-400/90">
+                  <p className="text-cyan-300 font-bold text-sm">
+                    &gt; INITIALIZING PRODUCTION WORKSPACE...
+                  </p>
+                  <p className="opacity-80">&gt; Mounting Flutter &amp; Android runtime core...</p>
+                  <p className="opacity-70">&gt; Syncing Urban Culture real-time telemetry pipelines...</p>
+                  <p className="opacity-60">&gt; Loading 3D hardware canvas &amp; systems architecture...</p>
+                  <p className="text-cyan-400 animate-pulse">&gt; Compiling interactive viewport. Stand by...</p>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="space-y-1.5 text-[11px]">
+                  <div className="flex justify-between text-slate-400">
+                    <span>SYSTEM BOOT SEQUENCE</span>
+                    <span className="text-cyan-300 font-bold">{bootProgress}%</span>
+                  </div>
+                  <div className="h-2.5 w-full bg-[#122428] rounded border border-cyan-500/30 overflow-hidden p-0.5">
+                    <div
+                      className="h-full bg-gradient-to-r from-cyan-500 via-teal-400 to-amber-400 rounded transition-all duration-150"
+                      style={{ width: `${bootProgress}%` }}
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Phosphor Scanlines Overlay */}
             {scanlinesEnabled && (
               <div className="pointer-events-none absolute inset-0 z-40 bg-[repeating-linear-gradient(0deg,transparent_0px,transparent_2px,rgba(0,0,0,0.18)_3px)] opacity-60" />
             )}
 
-            {/* Radial Glass Curvature Vignette */}
+            {/* CRT Glass Curvature Vignette */}
             <div
               className="pointer-events-none absolute inset-0 z-40"
               style={{
-                boxShadow: "inset 0 0 70px rgba(0,0,0,0.65), inset 0 0 15px rgba(0,0,0,0.85)",
+                boxShadow: "inset 0 0 60px rgba(0,0,0,0.65), inset 0 0 15px rgba(0,0,0,0.85)",
               }}
             />
           </div>
 
-          {/* Bottom Control Strip on Bezel */}
-          <div className="h-5 sm:h-6 bg-[#212327] border-t border-[#18191d] px-4 flex items-center justify-between font-mono text-[9px] text-slate-500 z-30">
-            <span>MODEL: CRT-4000 // FLUTTER &amp; SYSTEMS OS</span>
-            <span>STATUS: ACTIVE // ALL SYSTEMS OPERATIONAL</span>
+          {/* Lower Control Strip on Bezel */}
+          <div className="h-6 sm:h-7 bg-[#212328] border-t border-[#18191d] px-4 sm:px-6 flex items-center justify-between font-mono text-[9px] sm:text-[10px] text-slate-400 z-30 flex-shrink-0">
+            {/* Brand badge */}
+            <div className="flex items-center gap-2">
+              <span className="text-slate-500">SYS_ID:</span>
+              <span className="text-slate-300 font-semibold">AADIL-KHAN-FLUTTER-OS</span>
+            </div>
+
+            {/* Power LED & Tactile Buttons */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff] animate-pulse" />
+                <span className="text-[9px] text-slate-400 font-semibold">PWR</span>
+              </div>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4].map((i) => (
+                  <div
+                    key={i}
+                    className="w-3.5 h-1.5 rounded-[2px] bg-[#4a4c52] border border-[#33353a]"
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
+        </motion.div>
+
+        {/* ============================================================== */}
+        {/* MONITOR STAND (NECK & WEIGHTED BASE)                           */}
+        {/* ============================================================== */}
+        <motion.div
+          className="flex flex-col items-center flex-shrink-0 z-10"
+          animate={{
+            opacity: isSmall ? 1 : 0.4, // Subtly stays visible at the bottom of the screen!
+            scale: isSmall ? 1 : 0.85,
+            marginTop: isSmall ? "0px" : "-8px",
+          }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {/* Angled Neck / Swivel Hinge */}
+          <div
+            className="w-20 sm:w-28 h-5 sm:h-6 bg-[#32353b] border-x border-[#222428] shadow-lg"
+            style={{
+              clipPath: "polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%)",
+            }}
+          />
+
+          {/* Weighted Desk Base Foot */}
+          <div
+            className="w-44 sm:w-60 h-3 sm:h-4 rounded-b-xl bg-[#24262b] border-t border-[#3c3f46] shadow-2xl flex items-center justify-center"
+            style={{
+              boxShadow: "0 18px 30px rgba(0,0,0,0.9), inset 0 1px 2px rgba(255,255,255,0.15)",
+            }}
+          >
+            <div className="w-12 h-0.5 bg-[#181a1d] rounded-full" />
+          </div>
+        </motion.div>
       </motion.div>
     </div>
   );
