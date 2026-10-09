@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowDownRight, RotateCcw, Terminal } from "lucide-react";
+import { ArrowDownRight, RotateCcw } from "lucide-react";
 import { RetroMonitor } from "@/components/3d/RetroMonitor";
 
 export function HeroSection() {
@@ -26,14 +26,6 @@ export function HeroSection() {
 
       {/* 3D CRT Monitor Stage */}
       <div className="relative mt-6 w-full h-[440px] sm:h-[540px] lg:h-[620px] rounded-2xl border border-slate-800 bg-gradient-to-b from-[#0f171d] via-[#090e12] to-[#070a0e] overflow-hidden crt-grid-bg">
-        {/* Stage Topline */}
-        <div className="absolute top-4 left-6 right-6 z-20 flex justify-between font-mono text-xs text-slate-500 tracking-wider">
-          <span className="flex items-center gap-2">
-            <Terminal className="w-3.5 h-3.5 text-cyan-400" /> FIG. 01 — 3D HARDWARE SIMULATION
-          </span>
-          <span>CRT PHOSPHOR 60Hz</span>
-        </div>
-
         {/* 3D Canvas */}
         <div className="absolute inset-0 z-10 flex items-center justify-center">
           <RetroMonitor restart={restart} />
